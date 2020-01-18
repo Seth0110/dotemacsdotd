@@ -16,14 +16,6 @@
 (use-package jinja2-mode)
 (use-package json-mode)
 (use-package markdown-mode)
-(use-package pdf-tools
-  :config
-  (pdf-tools-install)
-  (setq-default pdf-view-display-size 'fit-page)
-  (add-hook 'pdf-view-mode-hook (lambda ()
-				  (cua-mode 0)))
-  (setq pdf-view-resize-factor 1.1))
-;; (use-package sourcerer-theme)
 (use-package terraform-mode)
 (use-package visual-regexp)
 (use-package visual-regexp-steroids)
