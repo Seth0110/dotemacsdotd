@@ -39,12 +39,16 @@
 (setq tramp-default-method "ssh")
 
 (load-file "~/.emacs.d/init-package.el")
+(load-file "~/.emacs.d/sourcerer-theme.el")
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   (quote
+    ("ebd9bea137cafba0138f5a6996aa6851c4ee8263844c75a57798faacbcf8e3e4" default)))
  '(package-selected-packages
    (quote
     (ace-jump-mode yaml-mode visual-regexp-steroids use-package terraform-mode sourcerer-theme pdf-tools markdown-mode json-mode jinja2-mode geiser dad-joke company auctex))))
