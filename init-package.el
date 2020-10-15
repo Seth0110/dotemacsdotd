@@ -1,5 +1,5 @@
 ;; Package management
-(add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
+(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -9,6 +9,9 @@
 (setq use-package-always-ensure t)
 (use-package ace-jump-mode
   :bind ("C-." . ace-jump-mode))
+(use-package base16-theme)
+(if (display-graphic-p)
+    (load-theme 'base16-solarized-light t))
 (use-package company
   :hook (prog-mode . company-mode))
 (use-package geiser)
@@ -20,3 +23,4 @@
 (use-package visual-regexp)
 (use-package visual-regexp-steroids)
 (use-package yaml-mode)
+(use-package jenkinsfile-mode)
