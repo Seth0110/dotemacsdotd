@@ -32,12 +32,37 @@
 (set-default-coding-systems 'utf-8)
 (set-face-attribute 'default nil :height 140)
 (set-language-environment 'utf-8)
-(add-hook 'text-mode-hook 'flyspell-mode)
+;; (add-hook 'text-mode-hook 'flyspell-mode)
 (add-hook 'text-mode-hook 'line-number-mode)
+
+;; Language-specific settings
+(define-key prog-mode-map [f5] #'compile)
 
 ;; Misc
 (setq ring-bell-function 'ignore)
 (defvar python-shell-interpreter "python3")
 (setq tramp-default-method "ssh")
 
+(setq abbrev-file-name
+      "~/.emacs.d/abbrev_defs")
+
+;; Load more files
+(load-file "~/.emacs.d/init-skeleton.el")
 (load-file "~/.emacs.d/init-package.el")
+(load-file "~/.emacs.d/init-custom-commands.el")
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(docker magit yaml-mode visual-regexp-steroids visual-regexp markdown-mode json-mode haskell-mode gnuplot-mode geiser-mit geiser elm-mode dockerfile-mode ace-jump-mode use-package)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)

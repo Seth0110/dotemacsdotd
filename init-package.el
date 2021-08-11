@@ -21,3 +21,7 @@
 (use-package visual-regexp)
 (use-package visual-regexp-steroids)
 (use-package yaml-mode)
+(use-package csharp-mode)
+(use-package purescript-mode)
+(use-package magit)
+(use-package docker)
