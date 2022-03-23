@@ -34,15 +34,19 @@
 (set-language-environment 'utf-8)
 ;; (add-hook 'text-mode-hook 'flyspell-mode)
 (add-hook 'text-mode-hook 'line-number-mode)
+(set-frame-font "CMU Typewriter Text 18" nil t)
 
 ;; Language-specific settings
 (define-key prog-mode-map [f5] #'compile)
+(setq c-default-style "k&r"
+      c-basic-offset 4)
 
 ;; Misc
+(setq diary-list-include-blanks t)
 (setq ring-bell-function 'ignore)
 (defvar python-shell-interpreter "python3")
 (setq tramp-default-method "ssh")
-
+(setq epa-pinentry-mode 'loopback)
 (setq abbrev-file-name
       "~/.emacs.d/abbrev_defs")
 
@@ -56,8 +60,11 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("e1498b2416922aa561076edc5c9b0ad7b34d8ff849f335c13364c8f4276904f0" "529c211e86eadecb67b6b64ffdf73e71c4337070bd9b3de053f8f7c5da9e07a2" default))
  '(package-selected-packages
-   '(docker magit yaml-mode visual-regexp-steroids visual-regexp markdown-mode json-mode haskell-mode gnuplot-mode geiser-mit geiser elm-mode dockerfile-mode ace-jump-mode use-package)))
+   '(sokoban clojure-mode docker magit yaml-mode visual-regexp-steroids visual-regexp markdown-mode json-mode haskell-mode gnuplot-mode geiser-mit geiser elm-mode dockerfile-mode ace-jump-mode use-package))
+ '(warning-suppress-types '((use-package) (emacs))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
