@@ -18,10 +18,11 @@
 (use-package haskell-mode)
 (use-package json-mode)
 (use-package markdown-mode)
-(use-package sourcerer-theme)
+(use-package srcery-theme)
 (use-package shakespeare-mode)
 (use-package visual-regexp)
 (use-package visual-regexp-steroids)
 (use-package yaml-mode)
 
+(load-theme 'srcery 1)
 (global-set-key (kbd "C-c ,") 'ace-jump-mode)

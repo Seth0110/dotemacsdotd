@@ -20,11 +20,13 @@
 (line-number-mode t)
 (cond ((display-graphic-p)
        (global-hl-line-mode 1)))
-(defvar linum-modes
-      '(prog-mode-hook
-	text-mode-hook))
-(dolist (mode linum-modes)
-  (add-hook mode 'display-line-numbers-mode))
+;; (defvar linum-modes
+;;       '(prog-mode-hook
+;; 	text-mode-hook))
+;; (dolist (mode linum-modes)
+;;   (add-hook mode 'display-line-numbers-mode))
+(global-display-line-numbers-mode)
+(setq display-line-numbers 'relative)
 
 ;; Text settings
 (show-paren-mode 1)
@@ -38,7 +40,7 @@
 
 ;; Language-specific settings
 (define-key prog-mode-map [f5] #'compile)
-(setq c-default-style "k&r"
+(setq c-default-style "linux"
       c-basic-offset 4)
 
 ;; Misc
@@ -61,7 +63,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("e1498b2416922aa561076edc5c9b0ad7b34d8ff849f335c13364c8f4276904f0" "529c211e86eadecb67b6b64ffdf73e71c4337070bd9b3de053f8f7c5da9e07a2" default))
+   '("c5a81a42df109b02a9a68dfe0ed530080372c1a0bbcb374da77ee3a57e1be719" "e1498b2416922aa561076edc5c9b0ad7b34d8ff849f335c13364c8f4276904f0" "529c211e86eadecb67b6b64ffdf73e71c4337070bd9b3de053f8f7c5da9e07a2" default))
  '(package-selected-packages
    '(sokoban clojure-mode docker magit yaml-mode visual-regexp-steroids visual-regexp markdown-mode json-mode haskell-mode gnuplot-mode geiser-mit geiser elm-mode dockerfile-mode ace-jump-mode use-package))
  '(warning-suppress-types '((use-package) (emacs))))
