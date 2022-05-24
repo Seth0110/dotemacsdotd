@@ -16,6 +16,7 @@
 (use-package geiser-mit)
 (use-package gnuplot-mode)
 (use-package haskell-mode)
+(use-package inkpot-theme)
 (use-package json-mode)
 (use-package markdown-mode)
 (use-package srcery-theme)
@@ -24,5 +25,5 @@
 (use-package visual-regexp-steroids)
 (use-package yaml-mode)
 
-(load-theme 'srcery 1)
+(load-theme 'inkpot 1)
 (global-set-key (kbd "C-c ,") 'ace-jump-mode)
