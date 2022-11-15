@@ -56,6 +56,8 @@
 (load-file "~/.emacs.d/init-skeleton.el")
 (load-file "~/.emacs.d/init-package.el")
 (load-file "~/.emacs.d/init-custom-commands.el")
+(if (file-exists-p "init-work.el")
+    (load-file "~/.emacs.d/init-work.el"))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -65,7 +67,7 @@
  '(custom-safe-themes
    '("8da34297ccd16aa9fdf75596dc06d519a5f036179fbff95107bbecdaadf965c4" "c5a81a42df109b02a9a68dfe0ed530080372c1a0bbcb374da77ee3a57e1be719" "e1498b2416922aa561076edc5c9b0ad7b34d8ff849f335c13364c8f4276904f0" "529c211e86eadecb67b6b64ffdf73e71c4337070bd9b3de053f8f7c5da9e07a2" default))
  '(package-selected-packages
-   '(advice-patch adjust-parens adaptive-wrap ada-ref-man inkpot-theme ada-mode ack ace-window sokoban clojure-mode docker magit yaml-mode visual-regexp-steroids visual-regexp markdown-mode json-mode haskell-mode gnuplot-mode geiser-mit geiser elm-mode dockerfile-mode ace-jump-mode use-package))
+   '(mines afternoon-theme elf-mode advice-patch adjust-parens adaptive-wrap ada-ref-man inkpot-theme ada-mode ack ace-window sokoban clojure-mode docker magit yaml-mode visual-regexp-steroids visual-regexp markdown-mode json-mode haskell-mode gnuplot-mode geiser-mit geiser elm-mode dockerfile-mode ace-jump-mode use-package))
  '(warning-suppress-types '((use-package) (emacs))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
