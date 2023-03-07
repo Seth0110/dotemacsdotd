@@ -33,7 +33,8 @@
 (set-language-environment 'utf-8)
 ;; (add-hook 'text-mode-hook 'flyspell-mode)
 (add-hook 'text-mode-hook 'line-number-mode)
-(set-frame-font "CMU Typewriter Text 18" nil t)
+(if (eq system-type 'gnu/linux)
+    (set-frame-font "CMU Typewriter Text 18" nil t))
 
 ;; Enabled advanced features
 (put 'upcase-region 'disabled nil)
