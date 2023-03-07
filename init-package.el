@@ -25,6 +25,7 @@
   :config (setq pomidor-sound-tick nil
                 pomidor-sound-tack nil))
 (use-package shakespeare-mode)
+(use-package solarized-theme)
 (use-package srcery-theme)
 (use-package uptimes)
 (use-package visual-regexp)
