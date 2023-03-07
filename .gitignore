@@ -1,3 +1,6 @@
 *
-!init*
-init-work.el
+!.gitignore
+!init-custom-commands.el
+!init-package.el
+!init-skeleton.el
+!init.el
