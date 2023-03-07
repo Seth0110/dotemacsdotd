@@ -39,9 +39,11 @@
 (global-set-key (kbd "C-c ,") 'ace-jump-mode)
 
 ;; Set pdf-tools as the default PDF viewer
-(setq TeX-view-program-selection '((output-pdf "PDF Tools"))
-      TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
-      TeX-source-correlate-start-server t)
-(add-hook 'TeX-after-compilation-finished-functions
-          #'TeX-revert-document-buffer)
-(pdf-tools-install)
+(if (eq system-type 'gnu/linux)
+    (progn
+      (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
+	    TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
+	    TeX-source-correlate-start-server t)
+      (add-hook 'TeX-after-compilation-finished-functions
+		#'TeX-revert-document-buffer)
+      (pdf-tools-install)))
