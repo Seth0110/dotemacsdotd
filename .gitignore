@@ -1,6 +1,7 @@
 *
 !.gitignore
 !init-custom-commands.el
+!init-org.el
 !init-package.el
 !init-skeleton.el
 !init.el
