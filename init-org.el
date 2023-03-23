@@ -39,3 +39,6 @@
          entry (file+headline "~/Documents/org/notes.org" "Random Notes")
          "** %?"
          :empty-lines 0)))
+
+;; Default log-mode on in agenda mode
+(setq org-agenda-start-with-log-mode t)
