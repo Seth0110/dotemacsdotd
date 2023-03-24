@@ -18,6 +18,21 @@
 (global-display-line-numbers-mode 1)
 (setq display-line-numbers-type 'relative)
 
+(use-package srcery-theme)
+
+(defun dark ()
+  "Enable dark mode"
+  (interactive)
+  (load-theme 'srcery))
+
+(defun light ()
+  "Enable light mode"
+  (interactive)
+  (progn
+    (disable-theme 'srcery)
+    (if (eq system-type 'gnu/linux)
+        (set-frame-font "CMU Typewriter Text 18" nil t))))
+
 (show-paren-mode 1)
 (defvar show-paren-delay 0)
 (set-default-coding-systems 'utf-8)
@@ -29,9 +44,7 @@
 (use-package csv-mode
   :init
   (add-hook 'csv-mode 'csv-align-mode))
-
-(put 'upcase-region 'disabled nil)
-(put 'downcase-region 'disabled nil)
+(add-hook 'text-mode-hook 'flyspell-mode)
 
 (use-package geiser)
 (use-package rainbow-delimiters
@@ -48,11 +61,14 @@
 (use-package bison-mode)
 (use-package dockerfile-mode)
 (use-package gnuplot)
-(use-package gnuplot-mode)
 (use-package haskell-mode)
 (use-package json-mode)
 (use-package markdown-mode)
 (use-package yaml-mode)
+(add-hook 'prog-mode-hook 'flyspell-prog-mode)
+
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
 
 (setq dired-listing-switches "-alFh")
 
@@ -62,13 +78,16 @@
 (setq eww-search-prefix "https://duckduckgo.com/lite/?q=")
 (setq browse-url-browser-function 'eww-browse-url)
 
-(use-package elfeed)
+(use-package elfeed
+  :config
+  (defalias 'elfeed-youtube
+    (kmacro "<return> C-n C-n C-n C-n C-n M-f M-f <return> & q q C-p")
+    "From the elfeed screen go down to the URL and open it in the external browser.")
+  (define-key elfeed-search-mode-map "y" 'elfeed-youtube))
+(use-package elfeed-dashboard)
 (use-package elfeed-org
   :config
   (elfeed-org)
-  (defalias 'elfeed-youtube
-    (kmacro "<return> C-n C-n C-n C-n C-n M-f M-f <return> & q q")
-    "From the elfeed screen go down to the URL and open it in the external browser.")
   (setq rmh-elfeed-org-files (list "~/Documents/org/elfeed.org")))
 
 (setq custom-file null-device)
@@ -88,23 +107,33 @@
 (use-package pdf-tools
   :config (set-pdf-tools))
 
-(use-package esh-autosuggest)
-(use-package eshell-syntax-highlighting)
-
-(use-package srcery-theme)
-
-(defun dark ()
-  "Enable dark mode"
-  (interactive)
-  (load-theme 'srcery))
-
-(defun light ()
-  "Enable light mode"
-  (interactive)
-  (progn
-    (disable-theme 'srcery)
-    (if (eq system-type 'gnu/linux)
-        (set-frame-font "CMU Typewriter Text 18" nil t))))
+(defun fish-path (path max-len)
+  "Return a potentially trimmed-down version of the directory PATH, replacing
+parent directories with their initial characters to try to get the character
+length of PATH (sans directory slashes) down to MAX-LEN."
+  (let* ((components (split-string (abbreviate-file-name path) "/"))
+         (len (+ (1- (length components))
+                 (reduce '+ components :key 'length)))
+         (str ""))
+    (while (and (> len max-len)
+                (cdr components))
+      (setq str (concat str
+                        (cond ((= 0 (length (car components))) "/")
+                              ((= 1 (length (car components)))
+                               (concat (car components) "/"))
+                              (t
+                               (if (string= "."
+                                            (string (elt (car components) 0)))
+                                   (concat (substring (car components) 0 2)
+                                           "/")
+                                 (string (elt (car components) 0) ?/)))))
+            len (- len (1- (length (car components))))
+            components (cdr components)))
+    (concat str (reduce (lambda (a b) (concat a "/" b)) components))))
+(setq eshell-prompt-function
+      (lambda ()
+        (concat (fish-path (eshell/pwd) 40)
+                (if (= (user-uid) 0) " # " " λ "))))
 
 (use-package pomidor
   :bind (("<f12>" . pomidor))
@@ -128,14 +157,26 @@
         ("WAIT" . "orange")
         ("CANCELLED" . "blue")))
 (setq org-log-done 'time)
-(use-package org-auto-tangle
-  :hook (org-mode . org-auto-tangle-mode)
-  :config (setq org-auto-tangle-default t))
+(use-package org-pomodoro)
 
 (setq org-return-follows-link t)
 (define-key global-map "\C-cl" 'org-store-link)
 (define-key global-map "\C-ca" 'org-agenda)
 (define-key global-map "\C-cc" 'org-capture)
+
+(use-package org-auto-tangle
+  :hook (org-mode . org-auto-tangle-mode)
+  :config (setq org-auto-tangle-default t))
+(defun set-compile-key ()
+  (local-set-key (kbd "<f5>") 'compile))
+(add-hook 'prog-mode-hook 'set-compile-key)
+(add-hook 'org-auto-tangle-mode-hook 'set-compile-key)
+(add-hook 'prog-mode-hook 'company-mode)
+(add-hook 'sly-mode-hook 'company-mode)
+(setq org-confirm-babel-evaluate nil)
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((gnuplot . t)))
 
 (defun reload ()
   "Reload the init file without restarting"
@@ -148,6 +189,8 @@
   (if (y-or-n-p (format "Are you sure you want to blaspheme the sacred editor? "))
       (save-buffers-kill-emacs)                                                                                          (message "That's what I thought.")))
 (global-set-key (kbd "C-x C-c") 'ask-before-closing)
+(use-package ace-jump-mode)
+(define-key global-map (kbd "C-.") 'ace-jump-mode)
 
 (define-skeleton s/h-l
   "Write a Haskell language extension."

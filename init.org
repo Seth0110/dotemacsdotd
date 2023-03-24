@@ -4,6 +4,9 @@
 
 * Init File
 ** Package
+
+Initialize package management
+
 #+begin_src emacs-lisp
   (package-initialize)
   (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
@@ -13,7 +16,7 @@
   (require 'use-package)
   (setq use-package-always-ensure t)
 #+end_src
-** Menus
+** Look & feel
 #+begin_src emacs-lisp
   (display-time-mode)
   (display-battery-mode)
@@ -21,7 +24,6 @@
   (scroll-bar-mode -1)
   (tool-bar-mode 0)
 #+end_src
-** Editing
 *** Line
 #+begin_src emacs-lisp
   (column-number-mode t)
@@ -30,6 +32,24 @@
   (global-display-line-numbers-mode 1)
   (setq display-line-numbers-type 'relative)
 #+end_src
+*** Theme
+#+begin_src emacs-lisp
+  (use-package srcery-theme)
+
+  (defun dark ()
+    "Enable dark mode"
+    (interactive)
+    (load-theme 'srcery))
+
+  (defun light ()
+    "Enable light mode"
+    (interactive)
+    (progn
+      (disable-theme 'srcery)
+      (if (eq system-type 'gnu/linux)
+          (set-frame-font "CMU Typewriter Text 18" nil t))))
+#+end_src
+** Editing
 *** Text
 #+begin_src emacs-lisp
   (show-paren-mode 1)
@@ -43,11 +63,7 @@
   (use-package csv-mode
     :init
     (add-hook 'csv-mode 'csv-align-mode))
-#+end_src
-*** Advanced Features
-#+begin_src emacs-lisp
-  (put 'upcase-region 'disabled nil)
-  (put 'downcase-region 'disabled nil)
+  (add-hook 'text-mode-hook 'flyspell-mode)
 #+end_src
 *** Programming
 **** Lisp
@@ -73,13 +89,25 @@
   (use-package bison-mode)
   (use-package dockerfile-mode)
   (use-package gnuplot)
-  (use-package gnuplot-mode)
   (use-package haskell-mode)
   (use-package json-mode)
   (use-package markdown-mode)
   (use-package yaml-mode)
+  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 #+end_src
+*** "Advanced" features
+#+begin_src emacs-lisp
+  (put 'upcase-region 'disabled nil)
+  (put 'downcase-region 'disabled nil)
+#+end_src
+
+#+RESULTS:
+: ace-jump-mode
+
 ** Navigation
+
+Network and directory settings
+
 *** Dired
 #+begin_src emacs-lisp
   (setq dired-listing-switches "-alFh")
@@ -97,21 +125,30 @@
 #+end_src
 **** RSS
 #+begin_src emacs-lisp
-  (use-package elfeed)
+  (use-package elfeed
+    :config
+    (defalias 'elfeed-youtube
+      (kmacro "<return> C-n C-n C-n C-n C-n M-f M-f <return> & q q C-p")
+      "From the elfeed screen go down to the URL and open it in the external browser.")
+    (define-key elfeed-search-mode-map "y" 'elfeed-youtube))
+  (use-package elfeed-dashboard)
   (use-package elfeed-org
     :config
     (elfeed-org)
-    (defalias 'elfeed-youtube
-      (kmacro "<return> C-n C-n C-n C-n C-n M-f M-f <return> & q q")
-      "From the elfeed screen go down to the URL and open it in the external browser.")
     (setq rmh-elfeed-org-files (list "~/Documents/org/elfeed.org")))
 #+end_src
 ** Annoying features
+
+I hate custom set variables and the bell!
+
 #+begin_src emacs-lisp
   (setq custom-file null-device)
   (setq ring-bell-function 'ignore)
 #+end_src
-** PDF Settings
+** PDF
+
+Use pdf-tools instead of the default viewer.
+
 #+begin_src emacs-lisp
   (defun set-pdf-tools ()
     "Set pdf-tools as the default PDF viewer"
@@ -128,26 +165,37 @@
     :config (set-pdf-tools))
 #+end_src
 ** Eshell
-#+begin_src emacs-lisp
-  (use-package esh-autosuggest)
-  (use-package eshell-syntax-highlighting)
-#+end_src
-** Theme
-#+begin_src emacs-lisp
-  (use-package srcery-theme)
 
-  (defun dark ()
-    "Enable dark mode"
-    (interactive)
-    (load-theme 'srcery))
+Using a shell that's a duct taped blob of lisp and linux is exactly what Emacs is about.
 
-  (defun light ()
-    "Enable light mode"
-    (interactive)
-    (progn
-      (disable-theme 'srcery)
-      (if (eq system-type 'gnu/linux)
-          (set-frame-font "CMU Typewriter Text 18" nil t))))
+#+begin_src emacs-lisp
+  (defun fish-path (path max-len)
+    "Return a potentially trimmed-down version of the directory PATH, replacing
+  parent directories with their initial characters to try to get the character
+  length of PATH (sans directory slashes) down to MAX-LEN."
+    (let* ((components (split-string (abbreviate-file-name path) "/"))
+           (len (+ (1- (length components))
+                   (reduce '+ components :key 'length)))
+           (str ""))
+      (while (and (> len max-len)
+                  (cdr components))
+        (setq str (concat str
+                          (cond ((= 0 (length (car components))) "/")
+                                ((= 1 (length (car components)))
+                                 (concat (car components) "/"))
+                                (t
+                                 (if (string= "."
+                                              (string (elt (car components) 0)))
+                                     (concat (substring (car components) 0 2)
+                                             "/")
+                                   (string (elt (car components) 0) ?/)))))
+              len (- len (1- (length (car components))))
+              components (cdr components)))
+      (concat str (reduce (lambda (a b) (concat a "/" b)) components))))
+  (setq eshell-prompt-function
+        (lambda ()
+          (concat (fish-path (eshell/pwd) 40)
+                  (if (= (user-uid) 0) " # " " λ "))))
 #+end_src
 ** Workflow
 #+begin_src emacs-lisp
@@ -164,7 +212,7 @@
   (setq org-hide-emphasis-markers t)
   (add-hook 'org-mode-hook 'visual-line-mode)
 #+end_src
-*** Todo
+*** Agenda and Tasks
 #+begin_src emacs-lisp
   (setq org-agenda-files
         (list "~/Documents/org/work.org"))
@@ -178,9 +226,7 @@
           ("WAIT" . "orange")
           ("CANCELLED" . "blue")))
   (setq org-log-done 'time)
-  (use-package org-auto-tangle
-    :hook (org-mode . org-auto-tangle-mode)
-    :config (setq org-auto-tangle-default t))
+  (use-package org-pomodoro)
 #+end_src
 *** Links
 #+begin_src emacs-lisp
@@ -188,6 +234,25 @@
   (define-key global-map "\C-cl" 'org-store-link)
   (define-key global-map "\C-ca" 'org-agenda)
   (define-key global-map "\C-cc" 'org-capture)
+#+end_src
+*** Programming
+
+<f5> should compile in programming mode and in org mode for literate programs.
+
+#+begin_src emacs-lisp
+  (use-package org-auto-tangle
+    :hook (org-mode . org-auto-tangle-mode)
+    :config (setq org-auto-tangle-default t))
+  (defun set-compile-key ()
+    (local-set-key (kbd "<f5>") 'compile))
+  (add-hook 'prog-mode-hook 'set-compile-key)
+  (add-hook 'org-auto-tangle-mode-hook 'set-compile-key)
+  (add-hook 'prog-mode-hook 'company-mode)
+  (add-hook 'sly-mode-hook 'company-mode)
+  (setq org-confirm-babel-evaluate nil)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((gnuplot . t)))
 #+end_src
 ** Custom Commands
 #+begin_src emacs-lisp
@@ -202,6 +267,8 @@
     (if (y-or-n-p (format "Are you sure you want to blaspheme the sacred editor? "))
         (save-buffers-kill-emacs)                                                                                          (message "That's what I thought.")))
   (global-set-key (kbd "C-x C-c") 'ask-before-closing)
+  (use-package ace-jump-mode)
+  (define-key global-map (kbd "C-.") 'ace-jump-mode)
 #+end_src
 ** Skeletons
 #+begin_src emacs-lisp
@@ -218,4 +285,3 @@ Work-related information that I don't want synced to my public git repo.
   (if (file-exists-p "init-work.el")
       (load-file "~/.emacs.d/init-work.el"))
 #+end_src
-
