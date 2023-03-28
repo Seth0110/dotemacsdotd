@@ -69,11 +69,9 @@ Initialize package management
 **** Lisp & Scheme
 #+begin_src emacs-lisp
   (use-package geiser)
-  (setq inferior-lisp-program "/usr/bin/sbcl")
   (use-package rainbow-delimiters
     :config
     :hook emacs-lisp-mode-hook)
-  (use-package sly)
 #+end_src
 **** Python
 #+begin_src emacs-lisp

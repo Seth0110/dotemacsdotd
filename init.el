@@ -47,11 +47,9 @@
 (add-hook 'text-mode-hook 'flyspell-mode)
 
 (use-package geiser)
-(setq inferior-lisp-program "/usr/bin/sbcl")
 (use-package rainbow-delimiters
   :config
   :hook emacs-lisp-mode-hook)
-(use-package sly)
 
 (defvar python-shell-interpreter "python3")
 
