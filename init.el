@@ -47,6 +47,7 @@
 (add-hook 'text-mode-hook 'flyspell-mode)
 
 (use-package geiser)
+(setq inferior-lisp-program "/usr/bin/sbcl")
 (use-package rainbow-delimiters
   :config
   :hook emacs-lisp-mode-hook)
@@ -90,9 +91,13 @@
   (elfeed-org)
   (setq rmh-elfeed-org-files (list "~/Documents/org/elfeed.org")))
 
-(setq custom-file null-device)
+(setq custom-file "~/.emacs.d/custom.el")
 (setq ring-bell-function 'ignore)
+(setq backup-directory-alist '(("." . "~/.emacs.d/saves")))
 
+(use-package pdf-tools
+  :config
+  (set-pdf-tools))
 (defun set-pdf-tools ()
   "Set pdf-tools as the default PDF viewer"
   (if (eq system-type 'gnu/linux)
@@ -103,9 +108,6 @@
         (add-hook 'TeX-after-compilation-finished-functions
                   #'TeX-revert-document-buffer)
         (pdf-tools-install))))
-
-(use-package pdf-tools
-  :config (set-pdf-tools))
 
 (defun fish-path (path max-len)
   "Return a potentially trimmed-down version of the directory PATH, replacing
@@ -164,6 +166,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 (define-key global-map "\C-ca" 'org-agenda)
 (define-key global-map "\C-cc" 'org-capture)
 
+(use-package company)
 (use-package org-auto-tangle
   :hook (org-mode . org-auto-tangle-mode)
   :config (setq org-auto-tangle-default t))

@@ -66,9 +66,10 @@ Initialize package management
   (add-hook 'text-mode-hook 'flyspell-mode)
 #+end_src
 *** Programming
-**** Lisp
+**** Lisp & Scheme
 #+begin_src emacs-lisp
   (use-package geiser)
+  (setq inferior-lisp-program "/usr/bin/sbcl")
   (use-package rainbow-delimiters
     :config
     :hook emacs-lisp-mode-hook)
@@ -139,17 +140,21 @@ Network and directory settings
 #+end_src
 ** Annoying features
 
-I hate custom set variables and the bell!
+I hate custom set variables and the bell!  Also put backup files into a single directory.
 
 #+begin_src emacs-lisp
-  (setq custom-file null-device)
+  (setq custom-file "~/.emacs.d/custom.el")
   (setq ring-bell-function 'ignore)
+  (setq backup-directory-alist '(("." . "~/.emacs.d/saves")))
 #+end_src
 ** PDF
 
 Use pdf-tools instead of the default viewer.
 
 #+begin_src emacs-lisp
+  (use-package pdf-tools
+    :config
+    (set-pdf-tools))
   (defun set-pdf-tools ()
     "Set pdf-tools as the default PDF viewer"
     (if (eq system-type 'gnu/linux)
@@ -160,9 +165,6 @@ Use pdf-tools instead of the default viewer.
           (add-hook 'TeX-after-compilation-finished-functions
                     #'TeX-revert-document-buffer)
           (pdf-tools-install))))
-
-  (use-package pdf-tools
-    :config (set-pdf-tools))
 #+end_src
 ** Eshell
 
@@ -240,6 +242,7 @@ Using a shell that's a duct taped blob of lisp and linux is exactly what Emacs i
 <f5> should compile in programming mode and in org mode for literate programs.
 
 #+begin_src emacs-lisp
+  (use-package company)
   (use-package org-auto-tangle
     :hook (org-mode . org-auto-tangle-mode)
     :config (setq org-auto-tangle-default t))
@@ -254,6 +257,9 @@ Using a shell that's a duct taped blob of lisp and linux is exactly what Emacs i
    'org-babel-load-languages
    '((gnuplot . t)))
 #+end_src
+
+#+RESULTS:
+
 ** Custom Commands
 #+begin_src emacs-lisp
   (defun reload ()
