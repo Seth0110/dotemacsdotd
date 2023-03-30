@@ -58,9 +58,10 @@ Initialize package management
   (set-face-attribute 'default nil :height 140)
   (set-language-environment 'utf-8)
   (add-hook 'text-mode-hook 'line-number-mode)
-  (if (eq system-type 'gnu/linux)
-      (set-frame-font "CMU Typewriter Text 18" nil t))
-  (use-package csv-mode
+  ;; (if (eq system-type 'gnu/linux)
+  ;;     (set-frame-font "CMU Typewriter Text 18" nil t))
+  ;; (us
+   e-package csv-mode
     :init
     (add-hook 'csv-mode 'csv-align-mode))
   (add-hook 'text-mode-hook 'flyspell-mode)
@@ -150,9 +151,6 @@ I hate custom set variables and the bell!  Also put backup files into a single d
 Use pdf-tools instead of the default viewer.
 
 #+begin_src emacs-lisp
-  (use-package pdf-tools
-    :config
-    (set-pdf-tools))
   (defun set-pdf-tools ()
     "Set pdf-tools as the default PDF viewer"
     (if (eq system-type 'gnu/linux)
@@ -163,6 +161,9 @@ Use pdf-tools instead of the default viewer.
           (add-hook 'TeX-after-compilation-finished-functions
                     #'TeX-revert-document-buffer)
           (pdf-tools-install))))
+  (use-package pdf-tools
+      :config
+      (set-pdf-tools))
 #+end_src
 ** Eshell
 

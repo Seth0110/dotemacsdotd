@@ -39,8 +39,8 @@
 (set-face-attribute 'default nil :height 140)
 (set-language-environment 'utf-8)
 (add-hook 'text-mode-hook 'line-number-mode)
-(if (eq system-type 'gnu/linux)
-    (set-frame-font "CMU Typewriter Text 18" nil t))
+;; (if (eq system-type 'gnu/linux)
+;;     (set-frame-font "CMU Typewriter Text 18" nil t))
 (use-package csv-mode
   :init
   (add-hook 'csv-mode 'csv-align-mode))
@@ -93,9 +93,6 @@
 (setq ring-bell-function 'ignore)
 (setq backup-directory-alist '(("." . "~/.emacs.d/saves")))
 
-(use-package pdf-tools
-  :config
-  (set-pdf-tools))
 (defun set-pdf-tools ()
   "Set pdf-tools as the default PDF viewer"
   (if (eq system-type 'gnu/linux)
@@ -106,6 +103,9 @@
         (add-hook 'TeX-after-compilation-finished-functions
                   #'TeX-revert-document-buffer)
         (pdf-tools-install))))
+(use-package pdf-tools
+    :config
+    (set-pdf-tools))
 
 (defun fish-path (path max-len)
   "Return a potentially trimmed-down version of the directory PATH, replacing
