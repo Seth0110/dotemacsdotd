@@ -30,7 +30,6 @@ Initialize package management
   (cond ((display-graphic-p)
          (global-hl-line-mode 1)))
   (global-display-line-numbers-mode 1)
-  (setq display-line-numbers-type 'relative)
 #+end_src
 *** Theme
 #+begin_src emacs-lisp
@@ -70,6 +69,7 @@ Initialize package management
 **** Lisp & Scheme
 #+begin_src emacs-lisp
   (use-package geiser)
+  (use-package geiser-guile)
   (use-package rainbow-delimiters
     :config
     :hook emacs-lisp-mode-hook)
@@ -83,6 +83,13 @@ Initialize package management
   (use-package csharp-mode)
   (setq c-default-style "linux"
         c-basic-offset 4)
+#+end_src
+**** Haskell
+#+begin_src emacs-lisp
+  (use-package haskell-mode
+    :hook
+    (haskell-mode-hook . (lambda () (setq compile-command "stack build"))))
+  (setq compile-command "make") 
 #+end_src
 **** Misc
 #+begin_src emacs-lisp
@@ -100,9 +107,6 @@ Initialize package management
   (put 'upcase-region 'disabled nil)
   (put 'downcase-region 'disabled nil)
 #+end_src
-
-#+RESULTS:
-: ace-jump-mode
 
 ** Navigation
 
@@ -200,10 +204,6 @@ Using a shell that's a duct taped blob of lisp and linux is exactly what Emacs i
 #+end_src
 ** Workflow
 #+begin_src emacs-lisp
-  (use-package pomidor
-    :bind (("<f12>" . pomidor))
-    :config (setq pomidor-sound-tick nil
-                  pomidor-sound-tack nil))
   (use-package uptimes)
 #+end_src
 ** Org
@@ -249,8 +249,6 @@ Using a shell that's a duct taped blob of lisp and linux is exactly what Emacs i
     (local-set-key (kbd "<f5>") 'compile))
   (add-hook 'prog-mode-hook 'set-compile-key)
   (add-hook 'org-auto-tangle-mode-hook 'set-compile-key)
-  (add-hook 'prog-mode-hook 'company-mode)
-  (add-hook 'sly-mode-hook 'company-mode)
   (setq org-confirm-babel-evaluate nil)
   (org-babel-do-load-languages
    'org-babel-load-languages
@@ -273,7 +271,7 @@ Using a shell that's a duct taped blob of lisp and linux is exactly what Emacs i
         (save-buffers-kill-emacs)                                                                                          (message "That's what I thought.")))
   (global-set-key (kbd "C-x C-c") 'ask-before-closing)
   (use-package ace-jump-mode)
-  (define-key global-map (kbd "C-.") 'ace-jump-mode)
+  (bind-key "C-." 'ace-jump-mode)
 #+end_src
 ** Skeletons
 #+begin_src emacs-lisp

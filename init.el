@@ -16,7 +16,6 @@
 (cond ((display-graphic-p)
        (global-hl-line-mode 1)))
 (global-display-line-numbers-mode 1)
-(setq display-line-numbers-type 'relative)
 
 (use-package srcery-theme)
 
@@ -47,6 +46,7 @@
 (add-hook 'text-mode-hook 'flyspell-mode)
 
 (use-package geiser)
+(use-package geiser-guile)
 (use-package rainbow-delimiters
   :config
   :hook emacs-lisp-mode-hook)
@@ -56,6 +56,11 @@
 (use-package csharp-mode)
 (setq c-default-style "linux"
       c-basic-offset 4)
+
+(use-package haskell-mode
+  :hook
+  (haskell-mode-hook . (lambda () (setq compile-command "stack build"))))
+(setq compile-command "make")
 
 (use-package bison-mode)
 (use-package dockerfile-mode)
@@ -135,10 +140,6 @@ length of PATH (sans directory slashes) down to MAX-LEN."
         (concat (fish-path (eshell/pwd) 40)
                 (if (= (user-uid) 0) " # " " λ "))))
 
-(use-package pomidor
-  :bind (("<f12>" . pomidor))
-  :config (setq pomidor-sound-tick nil
-                pomidor-sound-tack nil))
 (use-package uptimes)
 
 (add-hook 'org-mode-hook 'org-indent-mode)
@@ -172,8 +173,6 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   (local-set-key (kbd "<f5>") 'compile))
 (add-hook 'prog-mode-hook 'set-compile-key)
 (add-hook 'org-auto-tangle-mode-hook 'set-compile-key)
-(add-hook 'prog-mode-hook 'company-mode)
-(add-hook 'sly-mode-hook 'company-mode)
 (setq org-confirm-babel-evaluate nil)
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -191,7 +190,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
       (save-buffers-kill-emacs)                                                                                          (message "That's what I thought.")))
 (global-set-key (kbd "C-x C-c") 'ask-before-closing)
 (use-package ace-jump-mode)
-(define-key global-map (kbd "C-.") 'ace-jump-mode)
+(bind-key "C-." 'ace-jump-mode)
 
 (define-skeleton s/h-l
   "Write a Haskell language extension."
