@@ -6,6 +6,7 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
+(setq font "Liberation Mono 16")
 (display-time-mode)
 (display-battery-mode)
 (menu-bar-mode 0)
@@ -22,15 +23,16 @@
 (defun dark ()
   "Enable dark mode"
   (interactive)
-  (load-theme 'srcery))
+  (progn
+    (load-theme 'srcery)
+    (set-frame-font font nil t)))
 
 (defun light ()
   "Enable light mode"
   (interactive)
   (progn
     (disable-theme 'srcery)
-    (if (eq system-type 'gnu/linux)
-        (set-frame-font "CMU Typewriter Text 18" nil t))))
+    (set-frame-font font nil t)))
 
 (show-paren-mode 1)
 (defvar show-paren-delay 0)
@@ -38,8 +40,7 @@
 (set-face-attribute 'default nil :height 140)
 (set-language-environment 'utf-8)
 (add-hook 'text-mode-hook 'line-number-mode)
-;; (if (eq system-type 'gnu/linux)
-;;     (set-frame-font "CMU Typewriter Text 18" nil t))
+(set-frame-font font nil t)
 (use-package csv-mode
   :init
   (add-hook 'csv-mode 'csv-align-mode))
@@ -112,34 +113,6 @@
     :config
     (set-pdf-tools))
 
-(defun fish-path (path max-len)
-  "Return a potentially trimmed-down version of the directory PATH, replacing
-parent directories with their initial characters to try to get the character
-length of PATH (sans directory slashes) down to MAX-LEN."
-  (let* ((components (split-string (abbreviate-file-name path) "/"))
-         (len (+ (1- (length components))
-                 (reduce '+ components :key 'length)))
-         (str ""))
-    (while (and (> len max-len)
-                (cdr components))
-      (setq str (concat str
-                        (cond ((= 0 (length (car components))) "/")
-                              ((= 1 (length (car components)))
-                               (concat (car components) "/"))
-                              (t
-                               (if (string= "."
-                                            (string (elt (car components) 0)))
-                                   (concat (substring (car components) 0 2)
-                                           "/")
-                                 (string (elt (car components) 0) ?/)))))
-            len (- len (1- (length (car components))))
-            components (cdr components)))
-    (concat str (reduce (lambda (a b) (concat a "/" b)) components))))
-(setq eshell-prompt-function
-      (lambda ()
-        (concat (fish-path (eshell/pwd) 40)
-                (if (= (user-uid) 0) " # " " λ "))))
-
 (use-package uptimes)
 
 (add-hook 'org-mode-hook 'org-indent-mode)
@@ -165,7 +138,6 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 (define-key global-map "\C-ca" 'org-agenda)
 (define-key global-map "\C-cc" 'org-capture)
 
-(use-package company)
 (use-package org-auto-tangle
   :hook (org-mode . org-auto-tangle-mode)
   :config (setq org-auto-tangle-default t))

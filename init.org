@@ -18,6 +18,7 @@ Initialize package management
 #+end_src
 ** Look & feel
 #+begin_src emacs-lisp
+  (setq font "Liberation Mono 16")
   (display-time-mode)
   (display-battery-mode)
   (menu-bar-mode 0)
@@ -38,15 +39,16 @@ Initialize package management
   (defun dark ()
     "Enable dark mode"
     (interactive)
-    (load-theme 'srcery))
+    (progn
+      (load-theme 'srcery)
+      (set-frame-font font nil t)))
 
   (defun light ()
     "Enable light mode"
     (interactive)
     (progn
       (disable-theme 'srcery)
-      (if (eq system-type 'gnu/linux)
-          (set-frame-font "CMU Typewriter Text 18" nil t))))
+      (set-frame-font font nil t)))
 #+end_src
 ** Editing
 *** Text
@@ -57,10 +59,8 @@ Initialize package management
   (set-face-attribute 'default nil :height 140)
   (set-language-environment 'utf-8)
   (add-hook 'text-mode-hook 'line-number-mode)
-  ;; (if (eq system-type 'gnu/linux)
-  ;;     (set-frame-font "CMU Typewriter Text 18" nil t))
-  ;; (us
-   e-package csv-mode
+  (set-frame-font font nil t)
+  (use-package csv-mode
     :init
     (add-hook 'csv-mode 'csv-align-mode))
   (add-hook 'text-mode-hook 'flyspell-mode)
@@ -169,39 +169,6 @@ Use pdf-tools instead of the default viewer.
       :config
       (set-pdf-tools))
 #+end_src
-** Eshell
-
-Using a shell that's a duct taped blob of lisp and linux is exactly what Emacs is about.
-
-#+begin_src emacs-lisp
-  (defun fish-path (path max-len)
-    "Return a potentially trimmed-down version of the directory PATH, replacing
-  parent directories with their initial characters to try to get the character
-  length of PATH (sans directory slashes) down to MAX-LEN."
-    (let* ((components (split-string (abbreviate-file-name path) "/"))
-           (len (+ (1- (length components))
-                   (reduce '+ components :key 'length)))
-           (str ""))
-      (while (and (> len max-len)
-                  (cdr components))
-        (setq str (concat str
-                          (cond ((= 0 (length (car components))) "/")
-                                ((= 1 (length (car components)))
-                                 (concat (car components) "/"))
-                                (t
-                                 (if (string= "."
-                                              (string (elt (car components) 0)))
-                                     (concat (substring (car components) 0 2)
-                                             "/")
-                                   (string (elt (car components) 0) ?/)))))
-              len (- len (1- (length (car components))))
-              components (cdr components)))
-      (concat str (reduce (lambda (a b) (concat a "/" b)) components))))
-  (setq eshell-prompt-function
-        (lambda ()
-          (concat (fish-path (eshell/pwd) 40)
-                  (if (= (user-uid) 0) " # " " λ "))))
-#+end_src
 ** Workflow
 #+begin_src emacs-lisp
   (use-package uptimes)
@@ -241,7 +208,6 @@ Using a shell that's a duct taped blob of lisp and linux is exactly what Emacs i
 <f5> should compile in programming mode and in org mode for literate programs.
 
 #+begin_src emacs-lisp
-  (use-package company)
   (use-package org-auto-tangle
     :hook (org-mode . org-auto-tangle-mode)
     :config (setq org-auto-tangle-default t))
