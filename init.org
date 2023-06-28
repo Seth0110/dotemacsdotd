@@ -2,11 +2,14 @@
 #+author: Seth Sevier
 #+property: header-args :tangle init.el
 
+* Dependencies
+
+This init file requires the following external packages:
+- CMU Fonts
+- Python3
+
 * Init File
 ** Package
-
-Initialize package management
-
 #+begin_src emacs-lisp
   (package-initialize)
   (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
@@ -18,37 +21,33 @@ Initialize package management
 #+end_src
 ** Look & feel
 #+begin_src emacs-lisp
-  (setq font "Liberation Mono 16")
   (display-time-mode)
   (display-battery-mode)
   (menu-bar-mode 0)
   (scroll-bar-mode -1)
   (tool-bar-mode 0)
+
+  (use-package mixed-pitch
+    :hook
+    (text-mode . mixed-pitch-mode)
+    :config
+    (set-face-attribute 'default nil :font "CMU Typewriter Text 16")
+    (set-face-attribute 'fixed-pitch nil :font "CMU Typewriter Text 16")
+    (set-face-attribute 'variable-pitch nil :font "CMU Serif 16"))
 #+end_src
 *** Line
 #+begin_src emacs-lisp
   (column-number-mode t)
   (cond ((display-graphic-p)
          (global-hl-line-mode 1)))
-  (global-display-line-numbers-mode 1)
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+end_src
 *** Theme
 #+begin_src emacs-lisp
-  (use-package srcery-theme)
-
-  (defun dark ()
-    "Enable dark mode"
-    (interactive)
-    (progn
-      (load-theme 'srcery)
-      (set-frame-font font nil t)))
-
-  (defun light ()
-    "Enable light mode"
-    (interactive)
-    (progn
-      (disable-theme 'srcery)
-      (set-frame-font font nil t)))
+  (use-package eink-theme
+    :after
+    (load-theme eink))
+  (custom-set-faces '(link ((t (:background "#eeeee8")))))
 #+end_src
 ** Editing
 *** Text
@@ -63,20 +62,29 @@ Initialize package management
   (use-package csv-mode
     :init
     (add-hook 'csv-mode 'csv-align-mode))
-  (add-hook 'text-mode-hook 'flyspell-mode)
+  (use-package visual-regexp)
+  (use-package visual-regexp-steroids)
+  (use-package olivetti
+    :config (setq olivetti-body-width 80))
 #+end_src
 *** Programming
 **** Lisp & Scheme
 #+begin_src emacs-lisp
+  (use-package company)
+  (use-package sly
+    :config
+    (setq inferior-lisp-program "sbcl"))
   (use-package geiser)
   (use-package geiser-guile)
   (use-package rainbow-delimiters
-    :config
     :hook emacs-lisp-mode-hook)
+  (add-hook 'emacs-lisp-mode-hook 'company-mode)
 #+end_src
 **** Python
 #+begin_src emacs-lisp
   (defvar python-shell-interpreter "python3")
+  (use-package pyvenv)
+  (use-package pyvenv-auto)
 #+end_src
 **** C-like
 #+begin_src emacs-lisp
@@ -89,7 +97,12 @@ Initialize package management
   (use-package haskell-mode
     :hook
     (haskell-mode-hook . (lambda () (setq compile-command "stack build"))))
-  (setq compile-command "make") 
+  (use-package shakespeare-mode)
+  (defun haskell-mode-setup ()
+    (setq haskell-process-type 'stack-ghci))
+
+  (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+  (add-hook 'haskell-mode-hook 'haskell-mode-setup)
 #+end_src
 **** Misc
 #+begin_src emacs-lisp
@@ -100,18 +113,14 @@ Initialize package management
   (use-package json-mode)
   (use-package markdown-mode)
   (use-package yaml-mode)
-  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+  (use-package nginx-mode)
 #+end_src
 *** "Advanced" features
 #+begin_src emacs-lisp
   (put 'upcase-region 'disabled nil)
   (put 'downcase-region 'disabled nil)
 #+end_src
-
 ** Navigation
-
-Network and directory settings
-
 *** Dired
 #+begin_src emacs-lisp
   (setq dired-listing-switches "-alFh")
@@ -129,12 +138,7 @@ Network and directory settings
 #+end_src
 **** RSS
 #+begin_src emacs-lisp
-  (use-package elfeed
-    :config
-    (defalias 'elfeed-youtube
-      (kmacro "<return> C-n C-n C-n C-n C-n M-f M-f <return> & q q C-p")
-      "From the elfeed screen go down to the URL and open it in the external browser.")
-    (define-key elfeed-search-mode-map "y" 'elfeed-youtube))
+  (use-package elfeed)
   (use-package elfeed-dashboard)
   (use-package elfeed-org
     :config
@@ -143,7 +147,7 @@ Network and directory settings
 #+end_src
 ** Annoying features
 
-I hate custom set variables and the bell!  Also put backup files into a single directory.
+I hate custom set variables and the bell!
 
 #+begin_src emacs-lisp
   (setq custom-file "~/.emacs.d/custom.el")
@@ -151,9 +155,6 @@ I hate custom set variables and the bell!  Also put backup files into a single d
   (setq backup-directory-alist '(("." . "~/.emacs.d/saves")))
 #+end_src
 ** PDF
-
-Use pdf-tools instead of the default viewer.
-
 #+begin_src emacs-lisp
   (defun set-pdf-tools ()
     "Set pdf-tools as the default PDF viewer"
@@ -172,15 +173,33 @@ Use pdf-tools instead of the default viewer.
 ** Workflow
 #+begin_src emacs-lisp
   (use-package uptimes)
+  (use-package magit)
 #+end_src
-** Org
+** Org Mode
 *** General
 #+begin_src emacs-lisp
   (add-hook 'org-mode-hook 'org-indent-mode)
   (setq org-hide-emphasis-markers t)
   (add-hook 'org-mode-hook 'visual-line-mode)
+
+  (setq org-pretty-entities t)
+  (use-package org-appear
+      :hook (org-mode . org-appear-mode))
 #+end_src
-*** Agenda and Tasks
+*** Look & Feel
+#+begin_src emacs-lisp
+  (defun fix-org-mode-levels ()
+    "Stop the org-level headers from increasing in height relative to the other text."
+    (dolist (face '(org-level-1
+                    org-level-2
+                    org-level-3
+                    org-level-4
+                    org-level-5))
+      (set-face-attribute face nil :weight 'semi-bold :height 1.0)))
+
+  (add-hook 'org-mode-hook 'fix-org-mode-levels)
+#+end_src
+*** Agenda & Tasks
 #+begin_src emacs-lisp
   (setq org-agenda-files
         (list "~/Documents/org/work.org"))
@@ -192,9 +211,31 @@ Use pdf-tools instead of the default viewer.
         '(("TODO" . org-warning)
           ("NEXT" . "goldenrod")
           ("WAIT" . "orange")
-          ("CANCELLED" . "blue")))
+          ("CANCELLED" . "light blue")))
   (setq org-log-done 'time)
-  (use-package org-pomodoro)
+  (setq org-tags-column 0)
+#+end_src
+*** Clock
+
+Clocking commands for blocks of deep work.
+
+#+begin_src emacs-lisp
+  (setq org-clock-sound "~/.emacs.d/bell.wav")
+  
+  (defun clock-in ()
+    "Clock in to a task for a user-defined number of minutes & run brown noise script."
+    (interactive)
+    (let ((time (read-number "Enter minutes: ")))
+      (progn
+        (org-clock-in)
+        (org-timer-set-timer (format "00:%d:00" time)))))
+
+  (defun clock-out ()
+    "Stop org clock and timer."
+    (interactive)
+    (progn
+      (org-clock-out)
+      (org-timer-pause-or-continue)))
 #+end_src
 *** Links
 #+begin_src emacs-lisp
@@ -221,8 +262,17 @@ Use pdf-tools instead of the default viewer.
    '((gnuplot . t)))
 #+end_src
 
-#+RESULTS:
-
+*** Org Roam
+#+begin_src emacs-lisp
+  (use-package org-roam
+    :custom
+    (org-roam-directory "~/Documents/org/roam/")
+    :bind (("C-c n l" . org-roam-buffer-toggle)
+           ("C-c n f" . org-roam-node-find)
+           ("C-c n i" . org-roam-node-insert))
+    :config
+    (org-roam-setup))
+#+end_src
 ** Custom Commands
 #+begin_src emacs-lisp
   (defun reload ()
@@ -251,6 +301,6 @@ Use pdf-tools instead of the default viewer.
 Work-related information that I don't want synced to my public git repo.
 
 #+begin_src emacs-lisp
-  (if (file-exists-p "init-work.el")
+  (if (file-exists-p "~/.emacs.d/init-work.el")
       (load-file "~/.emacs.d/init-work.el"))
 #+end_src
