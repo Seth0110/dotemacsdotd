@@ -43,11 +43,38 @@ This init file requires the following external packages:
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+end_src
 *** Theme
+
+Apparently the little bit of science there is on eyestrain says that dark text on light background is better for your eyes.  It helps reduce glare since there's less contrast between the glare and the background, brighter light (think reading in the shade on a sunny day) helps focus the eye better, light text on a dark background with LCD screens also produces a halo effect on the letters and becomes more effortful to focus on.
+
+As for the lack of syntax highlighting; you don't need syntax highlighting to show you grammar when you read a book do you?
+
 #+begin_src emacs-lisp
-  (use-package eink-theme
-    :after
-    (load-theme eink))
-  (custom-set-faces '(link ((t (:background "#eeeee8")))))
+  (use-package eink-theme)
+  (use-package monochrome-theme)
+
+  (defun disable-themes ()
+    "Disable all themes."
+    (interactive)
+    (dolist (theme custom-enabled-themes)
+      (disable-theme theme)))
+
+  (defun dark ()
+    "Enable dark mode."
+    (interactive)
+    (progn
+      (disable-themes)
+      (load-theme 'monochrome)
+      (custom-set-faces '(link ((t (:background "#111117")))))))
+
+  (defun light ()
+    "Enable dark mode."
+    (interactive)
+    (progn
+      (disable-themes)
+      (load-theme 'eink)
+      (custom-set-faces '(link ((t (:background "#eeeee8")))))))
+
+  (light)
 #+end_src
 ** Editing
 *** Text
@@ -132,9 +159,27 @@ This init file requires the following external packages:
 #+end_src
 *** Internet
 **** Web
+
+I really like eww.  Much less distraction than a traditional browser, no javascript subverts paywalls and pop-ups, and images can be easily turned off.  I like to use olivetti-mode & eww-readable together.
+
+I've created a firefox launch command (for the handful of things that are clunky to use in Emacs, I.E. YouTube) so I can continue to /transcend the operating system/ and use an independent launcher.  I may make this into its own dmenu-replacing launcher package...
+
 #+begin_src emacs-lisp
   (setq eww-search-prefix "https://duckduckgo.com/lite/?q=")
   (setq browse-url-browser-function 'eww-browse-url)
+
+  (defun eww-read ()
+    (interactive)
+    (progn
+      (olivetti-mode)
+      (eww-readable)))
+
+  (define-key eww-mode-map (kbd "o") 'eww-read)
+
+  (defun firefox ()
+    "Launch firefox without a corresponding buffer."
+    (interactive)
+    (start-process "firefox" nil "firefox"))
 #+end_src
 **** RSS
 #+begin_src emacs-lisp
@@ -217,7 +262,11 @@ I hate custom set variables and the bell!
 #+end_src
 *** Clock
 
-Clocking commands for blocks of deep work.
+I like 45 minutes blocks separated by 5 minute breaks of getting up and walking around, or shorter blocks if I have an upcoming meeting.  I've tried out the Pomodoro method but I find the work blocks are too short.  I've also listened to the Andrew Huberman Podcast episode about ultradian cycles and 90 minutes being ideal, but I find that too long.
+
+I use both a timer and a clock so I can set finite work blocks, and also keep a log of the work I've accomplished through for my weekly status update meetings.
+
+Before a block I grab some coffee/tea, water, and put in Loop ear plugs and noise cancelling headphones.  I used to listen to YouTube during these blocks, but having a video in the background inevitably leads to distraction.  A good alternative to ear plugs/YouTube is [[https://gist.github.com/rsvp/1209835][brown noise]].
 
 #+begin_src emacs-lisp
   (setq org-clock-sound "~/.emacs.d/bell.wav")
@@ -252,17 +301,24 @@ Clocking commands for blocks of deep work.
   (use-package org-auto-tangle
     :hook (org-mode . org-auto-tangle-mode)
     :config (setq org-auto-tangle-default t))
+
   (defun set-compile-key ()
     (local-set-key (kbd "<f5>") 'compile))
+
   (add-hook 'prog-mode-hook 'set-compile-key)
+
   (add-hook 'org-auto-tangle-mode-hook 'set-compile-key)
+
   (setq org-confirm-babel-evaluate nil)
+
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((gnuplot . t)))
 #+end_src
+*** Notes
 
-*** Org Roam
+My note taking system is based around the [[https://zettelkasten.de/][Zettelkasten]] system.  The org-roam directory should be a TRAMP location so that all my emacsen can dump their data to the same location.
+
 #+begin_src emacs-lisp
   (use-package org-roam
     :custom
@@ -273,6 +329,11 @@ Clocking commands for blocks of deep work.
     :config
     (org-roam-setup))
 #+end_src
+
+**** TODO Citation
+
+Research and implement a proper system for citing external works.
+
 ** Custom Commands
 #+begin_src emacs-lisp
   (defun reload ()
