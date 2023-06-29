@@ -2,6 +2,14 @@
 #+author: Seth Sevier
 #+property: header-args :tangle init.el
 
+* Bootstrap
+
+This makes sure init.el is up to date, ~C-c C-c~ will also bootstrap the file if it does not exist.
+
+#+begin_src emacs-lisp
+  (org-babel-tangle-file "~/.emacs.d/init.org")
+#+end_src
+
 * Dependencies
 
 This init file requires the following external packages:
@@ -98,11 +106,6 @@ As for the lack of syntax highlighting; you don't need syntax highlighting to sh
 **** Lisp & Scheme
 #+begin_src emacs-lisp
   (use-package company)
-  (use-package sly
-    :config
-    (setq inferior-lisp-program "sbcl"))
-  (use-package geiser)
-  (use-package geiser-guile)
   (use-package rainbow-delimiters
     :hook emacs-lisp-mode-hook)
   (add-hook 'emacs-lisp-mode-hook 'company-mode)
@@ -322,7 +325,8 @@ My note taking system is based around the [[https://zettelkasten.de/][Zettelkast
 #+begin_src emacs-lisp
   (use-package org-roam
     :custom
-    (org-roam-directory "~/Documents/org/roam/")
+    ;; (org-roam-directory "~/Documents/org/roam/")
+    (org-roam-directory "/ssh:seth@sevier.xyz:~/Documents/Roam")
     :bind (("C-c n l" . org-roam-buffer-toggle)
            ("C-c n f" . org-roam-node-find)
            ("C-c n i" . org-roam-node-insert))
