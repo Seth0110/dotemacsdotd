@@ -39,10 +39,11 @@ This init file requires the following external packages:
     :hook
     (text-mode . mixed-pitch-mode)
     :config
-    (set-face-attribute 'default nil :font "CMU Typewriter Text 16")
-    (set-face-attribute 'fixed-pitch nil :font "CMU Typewriter Text 16")
+    (set-face-attribute 'default nil :font "FreeMono 16")
+    (set-face-attribute 'fixed-pitch nil :font "FreeMono 16")
     (set-face-attribute 'variable-pitch nil :font "CMU Serif 16"))
 #+end_src
+
 *** Line
 #+begin_src emacs-lisp
   (column-number-mode t)
@@ -93,7 +94,6 @@ As for the lack of syntax highlighting; you don't need syntax highlighting to sh
   (set-face-attribute 'default nil :height 140)
   (set-language-environment 'utf-8)
   (add-hook 'text-mode-hook 'line-number-mode)
-  (set-frame-font font nil t)
   (use-package csv-mode
     :init
     (add-hook 'csv-mode 'csv-align-mode))
@@ -318,26 +318,6 @@ Before a block I grab some coffee/tea, water, and put in Loop ear plugs and nois
    'org-babel-load-languages
    '((gnuplot . t)))
 #+end_src
-*** Notes
-
-My note taking system is based around the [[https://zettelkasten.de/][Zettelkasten]] system.  The org-roam directory should be a TRAMP location so that all my emacsen can dump their data to the same location.
-
-#+begin_src emacs-lisp
-  (use-package org-roam
-    :custom
-    ;; (org-roam-directory "~/Documents/org/roam/")
-    (org-roam-directory "/ssh:seth@sevier.xyz:~/Documents/Roam")
-    :bind (("C-c n l" . org-roam-buffer-toggle)
-           ("C-c n f" . org-roam-node-find)
-           ("C-c n i" . org-roam-node-insert))
-    :config
-    (org-roam-setup))
-#+end_src
-
-**** TODO Citation
-
-Research and implement a proper system for citing external works.
-
 ** Custom Commands
 #+begin_src emacs-lisp
   (defun reload ()
