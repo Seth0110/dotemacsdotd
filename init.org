@@ -10,6 +10,9 @@ This makes sure init.el is up to date, ~C-c C-c~ will also bootstrap the file if
   (org-babel-tangle-file "~/.emacs.d/init.org")
 #+end_src
 
+#+RESULTS:
+| /home/ssevier/.emacs.d/init.el |
+
 * Dependencies
 
 This init file requires the following external packages:
@@ -82,9 +85,8 @@ As for the lack of syntax highlighting; you don't need syntax highlighting to sh
       (disable-themes)
       (load-theme 'eink)
       (custom-set-faces '(link ((t (:background "#eeeee8")))))))
-
-  (light)
 #+end_src
+
 ** Editing
 *** Text
 #+begin_src emacs-lisp
@@ -105,10 +107,10 @@ As for the lack of syntax highlighting; you don't need syntax highlighting to sh
 *** Programming
 **** Lisp & Scheme
 #+begin_src emacs-lisp
-  (use-package company)
+  ;; (use-package company)
   (use-package rainbow-delimiters
     :hook emacs-lisp-mode-hook)
-  (add-hook 'emacs-lisp-mode-hook 'company-mode)
+  ;; (add-hook 'emacs-lisp-mode-hook 'company-mode)
 #+end_src
 **** Python
 #+begin_src emacs-lisp
@@ -133,6 +135,8 @@ As for the lack of syntax highlighting; you don't need syntax highlighting to sh
 
   (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
   (add-hook 'haskell-mode-hook 'haskell-mode-setup)
+
+  (custom-set-variables '(haskell-process-type 'stack-ghci))
 #+end_src
 **** Misc
 #+begin_src emacs-lisp
@@ -163,7 +167,7 @@ As for the lack of syntax highlighting; you don't need syntax highlighting to sh
 *** Internet
 **** Web
 
-I really like eww.  Much less distraction than a traditional browser, no javascript subverts paywalls and pop-ups, and images can be easily turned off.  I like to use olivetti-mode & eww-readable together.
+I really like eww.  Much less distraction than a traditional browser, no javascript subverts paywalls and pop-ups, and images can be easily turned off.  I also like to use olivetti-mode & eww-readable together.
 
 I've created a firefox launch command (for the handful of things that are clunky to use in Emacs, I.E. YouTube) so I can continue to /transcend the operating system/ and use an independent launcher.  I may make this into its own dmenu-replacing launcher package...
 
@@ -320,19 +324,28 @@ Before a block I grab some coffee/tea, water, and put in Loop ear plugs and nois
 #+end_src
 ** Custom Commands
 #+begin_src emacs-lisp
-  (defun reload ()
-    "Reload the init file without restarting"
-    (interactive)
-    (load-file "~/.emacs.d/init.el"))
+    (defun reload ()
+      "Reload the init file without restarting"
+      (interactive)
+      (load-file "~/.emacs.d/init.el"))
 
-  (defun ask-before-closing ()
-    "Ask if you really want to quit"
-    (interactive)
-    (if (y-or-n-p (format "Are you sure you want to blaspheme the sacred editor? "))
-        (save-buffers-kill-emacs)                                                                                          (message "That's what I thought.")))
-  (global-set-key (kbd "C-x C-c") 'ask-before-closing)
-  (use-package ace-jump-mode)
-  (bind-key "C-." 'ace-jump-mode)
+    (defun ask-before-closing ()
+      "Ask if you really want to quit"
+      (interactive)
+      (if (y-or-n-p (format "Are you sure you want to blaspheme the sacred editor? "))
+          (save-buffers-kill-emacs)                                                                                          (message "That's what I thought.")))
+    (global-set-key (kbd "C-x C-c") 'ask-before-closing)
+    (use-package ace-jump-mode)
+    (bind-key "C-." 'ace-jump-mode)
+
+    (defun slock ()
+      (interactive)
+      (start-process "slock" nil "slock"))
+
+    (defun launch ()
+      (interactive)
+      (let ((cmd (read-string "Command: ")))
+        (start-process cmd nil cmd)))
 #+end_src
 ** Skeletons
 #+begin_src emacs-lisp
