@@ -1,0 +1,256 @@
+(org-babel-tangle-file "~/.emacs.d/init.org")
+
+(package-initialize)
+(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(require 'use-package)
+(setq use-package-always-ensure t)
+
+(display-time-mode)
+(display-battery-mode)
+(menu-bar-mode 0)
+(scroll-bar-mode -1)
+(tool-bar-mode 0)
+
+(use-package mixed-pitch
+  :hook
+  (text-mode . mixed-pitch-mode)
+  :config
+  (set-face-attribute 'default nil :font "FreeMono 16")
+  (set-face-attribute 'fixed-pitch nil :font "FreeMono 16")
+  (set-face-attribute 'variable-pitch nil :font "CMU Serif 16"))
+
+(column-number-mode t)
+(cond ((display-graphic-p)
+       (global-hl-line-mode 1)))
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
+
+(use-package eink-theme)
+(use-package monochrome-theme)
+
+(defun disable-themes ()
+  "Disable all themes."
+  (interactive)
+  (dolist (theme custom-enabled-themes)
+    (disable-theme theme)))
+
+(defun dark ()
+  "Enable dark mode."
+  (interactive)
+  (progn
+    (disable-themes)
+    (load-theme 'monochrome)
+    (custom-set-faces '(link ((t (:background "#111117")))))))
+
+(defun light ()
+  "Enable dark mode."
+  (interactive)
+  (progn
+    (disable-themes)
+    (load-theme 'eink)
+    (custom-set-faces '(link ((t (:background "#eeeee8")))))))
+
+(show-paren-mode 1)
+(defvar show-paren-delay 0)
+(set-default-coding-systems 'utf-8)
+(set-face-attribute 'default nil :height 140)
+(set-language-environment 'utf-8)
+(add-hook 'text-mode-hook 'line-number-mode)
+(use-package csv-mode
+  :init
+  (add-hook 'csv-mode 'csv-align-mode))
+(use-package visual-regexp)
+(use-package visual-regexp-steroids)
+(use-package olivetti
+  :config (setq olivetti-body-width 80))
+
+;; (use-package company)
+(use-package rainbow-delimiters
+  :hook emacs-lisp-mode-hook)
+;; (add-hook 'emacs-lisp-mode-hook 'company-mode)
+
+(defvar python-shell-interpreter "python3")
+(use-package pyvenv)
+(use-package pyvenv-auto)
+
+(use-package csharp-mode)
+(setq c-default-style "linux"
+      c-basic-offset 4)
+
+(use-package haskell-mode
+  :hook
+  (haskell-mode-hook . (lambda () (setq compile-command "stack build"))))
+(use-package shakespeare-mode)
+(defun haskell-mode-setup ()
+  (setq haskell-process-type 'stack-ghci))
+
+(add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+(add-hook 'haskell-mode-hook 'haskell-mode-setup)
+
+(custom-set-variables '(haskell-process-type 'stack-ghci))
+
+(use-package bison-mode)
+(use-package dockerfile-mode)
+(use-package gnuplot)
+(use-package haskell-mode)
+(use-package json-mode)
+(use-package markdown-mode)
+(use-package yaml-mode)
+(use-package nginx-mode)
+
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
+
+(setq dired-listing-switches "-alFh")
+
+(setq tramp-default-method "ssh")
+(setq epa-pinentry-mode 'loopback)
+
+(setq eww-search-prefix "https://duckduckgo.com/lite/?q=")
+(setq browse-url-browser-function 'eww-browse-url)
+
+(defun eww-read ()
+  (interactive)
+  (progn
+    (olivetti-mode)
+    (eww-readable)))
+
+(define-key eww-mode-map (kbd "o") 'eww-read)
+
+(defun firefox ()
+  "Launch firefox without a corresponding buffer."
+  (interactive)
+  (start-process "firefox" nil "firefox"))
+
+(use-package elfeed)
+(use-package elfeed-dashboard)
+(use-package elfeed-org
+  :config
+  (elfeed-org)
+  (setq rmh-elfeed-org-files (list "~/Documents/org/elfeed.org")))
+
+(setq custom-file "~/.emacs.d/custom.el")
+(setq ring-bell-function 'ignore)
+(setq backup-directory-alist '(("." . "~/.emacs.d/saves")))
+
+(defun set-pdf-tools ()
+  "Set pdf-tools as the default PDF viewer"
+  (if (eq system-type 'gnu/linux)
+      (progn
+        (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
+              TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
+              TeX-source-correlate-start-server t)
+        (add-hook 'TeX-after-compilation-finished-functions
+                  #'TeX-revert-document-buffer)
+        (pdf-tools-install))))
+(use-package pdf-tools
+    :config
+    (set-pdf-tools))
+
+(use-package uptimes)
+(use-package magit)
+
+(add-hook 'org-mode-hook 'org-indent-mode)
+(setq org-hide-emphasis-markers t)
+(add-hook 'org-mode-hook 'visual-line-mode)
+
+(setq org-pretty-entities t)
+(use-package org-appear
+    :hook (org-mode . org-appear-mode))
+
+(defun fix-org-mode-levels ()
+  "Stop the org-level headers from increasing in height relative to the other text."
+  (dolist (face '(org-level-1
+                  org-level-2
+                  org-level-3
+                  org-level-4
+                  org-level-5))
+    (set-face-attribute face nil :weight 'semi-bold :height 1.0)))
+
+(add-hook 'org-mode-hook 'fix-org-mode-levels)
+
+(setq org-agenda-files
+      (list "~/Documents/org/work.org"))
+(setq org-agenda-start-with-log-mode t)
+
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "NEXT(n)" "WAIT(w@)" "|" "DONE(d!)" "CANCELLED(c@)")))
+(setq org-todo-keyword-faces
+      '(("TODO" . org-warning)
+        ("NEXT" . "goldenrod")
+        ("WAIT" . "orange")
+        ("CANCELLED" . "light blue")))
+(setq org-log-done 'time)
+(setq org-tags-column 0)
+
+(setq org-clock-sound "~/.emacs.d/bell.wav")
+
+(defun clock-in ()
+  "Clock in to a task for a user-defined number of minutes & run brown noise script."
+  (interactive)
+  (let ((time (read-number "Enter minutes: ")))
+    (progn
+      (org-clock-in)
+      (org-timer-set-timer (format "00:%d:00" time)))))
+
+(defun clock-out ()
+  "Stop org clock and timer."
+  (interactive)
+  (progn
+    (org-clock-out)
+    (org-timer-pause-or-continue)))
+
+(setq org-return-follows-link t)
+(define-key global-map "\C-cl" 'org-store-link)
+(define-key global-map "\C-ca" 'org-agenda)
+(define-key global-map "\C-cc" 'org-capture)
+
+(use-package org-auto-tangle
+  :hook (org-mode . org-auto-tangle-mode)
+  :config (setq org-auto-tangle-default t))
+
+(defun set-compile-key ()
+  (local-set-key (kbd "<f5>") 'compile))
+
+(add-hook 'prog-mode-hook 'set-compile-key)
+
+(add-hook 'org-auto-tangle-mode-hook 'set-compile-key)
+
+(setq org-confirm-babel-evaluate nil)
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((gnuplot . t)))
+
+(defun reload ()
+  "Reload the init file without restarting"
+  (interactive)
+  (load-file "~/.emacs.d/init.el"))
+
+(defun ask-before-closing ()
+  "Ask if you really want to quit"
+  (interactive)
+  (if (y-or-n-p (format "Are you sure you want to blaspheme the sacred editor? "))
+      (save-buffers-kill-emacs)                                                                                          (message "That's what I thought.")))
+(global-set-key (kbd "C-x C-c") 'ask-before-closing)
+(use-package ace-jump-mode)
+(bind-key "C-." 'ace-jump-mode)
+
+(defun slock ()
+  (interactive)
+  (start-process "slock" nil "slock"))
+
+(defun launch ()
+  (interactive)
+  (let ((cmd (read-string "Command: ")))
+    (start-process cmd nil cmd)))
+
+(define-skeleton s/h-l
+  "Write a Haskell language extension."
+  "LANGUAGE: "
+  "{-# LANGUAGE " str " #-}")
+
+(if (file-exists-p "~/.emacs.d/init-work.el")
+    (load-file "~/.emacs.d/init-work.el"))
