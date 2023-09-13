@@ -1,4 +1,5 @@
 *
 !.gitignore
-!.github/README.org
 !init.el
+!LICENSE
+!README.org
