@@ -1,4 +1,6 @@
-;; Set up package management
+;;;; My personal Emacs configuration file.
+
+;;; Set up package management
 (package-initialize)
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 (unless (package-installed-p 'use-package)
@@ -7,29 +9,25 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
-;; Various display modes
+;;; Various display modes
 (display-time-mode)
 (display-battery-mode)
 (menu-bar-mode 0)
 (scroll-bar-mode -1)
 (tool-bar-mode 0)
 
-;; Font
+;;; Font
 (use-package mixed-pitch
   :hook
-  (text-mode . mixed-pitch-mode)
-  :config
-  (set-face-attribute 'default nil :font "FreeMono 16")
-  (set-face-attribute 'fixed-pitch nil :font "FreeMono 16")
-  (set-face-attribute 'variable-pitch nil :font "CMU Serif 16"))
+  (text-mode . mixed-pitch-mode))
 
-;; Column & line numbers
+;;; Column & line numbers
 (column-number-mode t)
 (cond ((display-graphic-p)
        (global-hl-line-mode 1)))
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
-;; Text settings
+;;; Text settings
 (show-paren-mode 1)
 (defvar show-paren-delay 0)
 (set-default-coding-systems 'utf-8)
@@ -44,21 +42,34 @@
 (use-package olivetti
   :config (setq olivetti-body-width 80))
 
-;; Lisp
+;;; Autocomplete
+(use-package company)
+(add-hook 'lisp-mode-hook 'company-mode)
+
+;;; Lisp
+(setq inferior-lisp-program "/usr/bin/sbcl")
 (use-package rainbow-delimiters
   :hook emacs-lisp-mode-hook)
+(use-package sly)
+(use-package sly-asdf)
+(use-package sly-quicklisp)
+(use-package clhs)
 
-;; Python
+;;; Elisp & Eshell
+(require 'em-tramp)
+(add-to-list 'eshell-modules-list 'eshell-tramp)
+
+;;; Python
 (defvar python-shell-interpreter "python3")
 (use-package pyvenv)
 (use-package pyvenv-auto)
 
-;; CSharp
+;;; CSharp
 (use-package csharp-mode)
 (setq c-default-style "linux"
       c-basic-offset 4)
 
-;; Haskell
+;;; Haskell
 (use-package haskell-mode
   :hook
   (haskell-mode-hook . (lambda () (setq compile-command "stack build"))))
@@ -73,7 +84,11 @@
   "LANGUAGE: "
   "{-# LANGUAGE " str " #-}")
 
-;; Various languages
+;;; SageMath
+(use-package sage-shell-mode)
+(use-package ob-sagemath)
+
+;;; Various languages
 (use-package bison-mode)
 (use-package dockerfile-mode)
 (use-package gnuplot)
@@ -81,19 +96,18 @@
 (use-package json-mode)
 (use-package markdown-mode)
 (use-package nginx-mode)
-(use-package sage-shell-mode)
 (use-package yaml-mode)
 
-;; Enable "advanced" features
+;;; Enable "advanced" features
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
 
-;; Directory
+;;; Directory
 (setq dired-listing-switches "-alFh")
 (setq tramp-default-method "ssh")
 (setq epa-pinentry-mode 'loopback)
 
-;; Web
+;;; Web
 (setq eww-search-prefix "https://duckduckgo.com/lite/?q=")
 (setq browse-url-browser-function 'eww-browse-url)
 (defun eww-read ()
@@ -107,7 +121,7 @@
   (interactive)
   (start-process "firefox" nil "firefox"))
 
-;; RSS
+;;; RSS
 (use-package elfeed)
 (use-package elfeed-dashboard)
 (use-package elfeed-org
@@ -115,12 +129,13 @@
   (elfeed-org)
   (setq rmh-elfeed-org-files (list "~/Documents/org/elfeed.org")))
 
-;; Annoying settings
+;;; Annoying settings
 (setq custom-file "~/.emacs.d/custom.el")
 (setq ring-bell-function 'ignore)
 (setq backup-directory-alist '(("." . "~/.emacs.d/saves")))
+(global-unset-key (kbd "C-z"))
 
-;; PDF
+;;; PDF
 (defun set-pdf-tools ()
   "Set pdf-tools as the default PDF viewer"
   (if (eq system-type 'gnu/linux)
@@ -135,13 +150,13 @@
     :config
     (set-pdf-tools))
 
-;; Uptimes
+;;; Uptimes
 (use-package uptimes)
 
-;; Revision control
+;;; Revision control
 (use-package magit)
 
-;; Org mode
+;;; Org mode
 (add-hook 'org-mode-hook 'org-indent-mode)
 (setq org-hide-emphasis-markers t)
 (add-hook 'org-mode-hook 'visual-line-mode)
@@ -169,9 +184,11 @@
 (setq org-confirm-babel-evaluate nil)
 (org-babel-do-load-languages
  'org-babel-load-languages
- '((gnuplot . t)))
+ '((gnuplot . t)
+   (python . t)))
+ 
 
-;; Custom functions
+;;; Custom functions
 (defun reload ()
   "Reload the init file without restarting"
   (interactive)
@@ -189,10 +206,10 @@
   (let ((cmd (read-string "Command: ")))
     (start-process cmd nil cmd)))
 
-;; Movement
+;;; Movement
 (use-package ace-jump-mode)
 (bind-key "C-." 'ace-jump-mode)
 
-;; Work stuff
+;;; Work stuff
 (if (file-exists-p "~/.emacs.d/work.el")
     (load-file "~/.emacs.d/work.el"))
