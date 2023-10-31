@@ -27,6 +27,10 @@
        (global-hl-line-mode 1)))
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
+;;; Color scheme
+(if (not (window-system))
+    (load-theme 'adwaita))
+
 ;;; Text settings
 (show-paren-mode 1)
 (defvar show-paren-delay 0)
