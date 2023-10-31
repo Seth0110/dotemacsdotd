@@ -44,6 +44,7 @@
 
 ;;; Autocomplete
 (use-package company)
+(add-hook 'sly-mode-hook 'company-mode)
 (add-hook 'lisp-mode-hook 'company-mode)
 
 ;;; Lisp
@@ -59,14 +60,18 @@
 (require 'em-tramp)
 (add-to-list 'eshell-modules-list 'eshell-tramp)
 
+;;; Scheme
+(use-package geiser)
+(use-package geiser-mit)
+(add-hook 'scheme-mode-hook 'geiser-mode)
+
 ;;; Python
 (defvar python-shell-interpreter "python3")
 (use-package pyvenv)
 (use-package pyvenv-auto)
 
-;;; CSharp
-(use-package csharp-mode)
-(setq c-default-style "linux"
+;;; C
+(setq c-default-style "k&r"
       c-basic-offset 4)
 
 ;;; Haskell
@@ -198,7 +203,8 @@
   "Ask if you really want to quit"
   (interactive)
   (if (y-or-n-p (format "Are you sure you want to blaspheme the sacred editor? "))
-      (save-buffers-kill-emacs)                                                                                          (message "That's what I thought.")))
+      (save-buffers-kill-emacs)
+    (message "That's what I thought.")))
 (global-set-key (kbd "C-x C-c") 'ask-before-closing)
 
 (defun launch ()
