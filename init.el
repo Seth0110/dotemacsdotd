@@ -51,6 +51,9 @@
 (add-hook 'sly-mode-hook 'company-mode)
 (add-hook 'lisp-mode-hook 'company-mode)
 
+;;; Compilation
+(global-set-key [f5] 'compile)
+
 ;;; Lisp
 (setq inferior-lisp-program "/usr/bin/sbcl")
 (use-package rainbow-delimiters
