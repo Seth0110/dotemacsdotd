@@ -31,6 +31,10 @@
 (if (not (window-system))
     (load-theme 'adwaita))
 
+;;; Window settings
+(use-package golden-ratio)
+(global-set-key (kbd "C-S-g") 'golden-ratio)
+
 ;;; Text settings
 (show-paren-mode 1)
 (defvar show-paren-delay 0)
@@ -48,53 +52,38 @@
 
 ;;; Autocomplete
 (use-package company)
-(add-hook 'sly-mode-hook 'company-mode)
-(add-hook 'lisp-mode-hook 'company-mode)
 
 ;;; Compilation
 (global-set-key [f5] 'compile)
-
-;;; Lisp
-(setq inferior-lisp-program "/usr/bin/sbcl")
-(use-package rainbow-delimiters
-  :hook emacs-lisp-mode-hook)
-(use-package sly)
-(use-package sly-asdf)
-(use-package sly-quicklisp)
-(use-package clhs)
-
-;;; Elisp & Eshell
-(require 'em-tramp)
-(add-to-list 'eshell-modules-list 'eshell-tramp)
-
-;;; Scheme
-(use-package geiser)
-(use-package geiser-mit)
-(add-hook 'scheme-mode-hook 'geiser-mode)
-
-;;; Python
-(defvar python-shell-interpreter "python3")
-(use-package pyvenv)
-(use-package pyvenv-auto)
+(setq compilation-always-kill t)
 
 ;;; C
 (setq c-default-style "k&r"
       c-basic-offset 4)
 
+;;; Elisp & Eshell
+(require 'em-tramp)
+(add-to-list 'eshell-modules-list 'eshell-tramp)
+
 ;;; Haskell
-(use-package haskell-mode
-  :hook
-  (haskell-mode-hook . (lambda () (setq compile-command "stack build"))))
+(use-package company-ghci)
+(use-package haskell-mode)
+(use-package hindent)
 (use-package shakespeare-mode)
-(defun haskell-mode-setup ()
-  (setq haskell-process-type 'stack-ghci))
-(add-hook 'haskell-mode-hook 'interactive-haskell-mode)
-(add-hook 'haskell-mode-hook 'haskell-mode-setup)
+(setq haskell-process-type 'stack-ghci)
 (custom-set-variables '(haskell-process-type 'stack-ghci))
-(define-skeleton s/h-l
-  "Write a Haskell language extension."
-  "LANGUAGE: "
-  "{-# LANGUAGE " str " #-}")
+(add-hook 'haskell-mode-hook 'company-mode)
+(add-hook 'haskell-mode-hook 'haskell-indentation-mode)
+(add-hook 'haskell-mode-hook 'haskell-mode-setup)
+(add-hook 'haskell-mode-hook 'hindent-mode)
+(add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+(add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
+(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+
+;;; Python
+(defvar python-shell-interpreter "python3")
+(use-package pyvenv)
+(use-package pyvenv-auto)
 
 ;;; SageMath
 (use-package sage-shell-mode)
@@ -111,13 +100,13 @@
 (use-package yaml-mode)
 
 ;;; Enable "advanced" features
-(put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
 
 ;;; Directory
 (setq dired-listing-switches "-alFh")
-(setq tramp-default-method "ssh")
 (setq epa-pinentry-mode 'loopback)
+(setq tramp-default-method "ssh")
 
 ;;; Web
 (setq eww-search-prefix "https://duckduckgo.com/lite/?q=")
@@ -128,24 +117,12 @@
     (olivetti-mode)
     (eww-readable)))
 (define-key eww-mode-map (kbd "o") 'eww-read)
-(defun firefox ()
-  "Launch firefox without a corresponding buffer."
-  (interactive)
-  (start-process "firefox" nil "firefox"))
-
-;;; RSS
-(use-package elfeed)
-(use-package elfeed-dashboard)
-(use-package elfeed-org
-  :config
-  (elfeed-org)
-  (setq rmh-elfeed-org-files (list "~/Documents/org/elfeed.org")))
 
 ;;; Annoying settings
+(global-unset-key (kbd "C-z"))
+(setq backup-directory-alist '(("." . "~/.emacs.d/saves")))
 (setq custom-file "~/.emacs.d/custom.el")
 (setq ring-bell-function 'ignore)
-(setq backup-directory-alist '(("." . "~/.emacs.d/saves")))
-(global-unset-key (kbd "C-z"))
 
 ;;; PDF
 (defun set-pdf-tools ()
@@ -161,9 +138,6 @@
 (use-package pdf-tools
     :config
     (set-pdf-tools))
-
-;;; Uptimes
-(use-package uptimes)
 
 ;;; Revision control
 (use-package magit)
@@ -190,15 +164,15 @@
 (define-key global-map "\C-cl" 'org-store-link)
 (define-key global-map "\C-ca" 'org-agenda)
 (define-key global-map "\C-cc" 'org-capture)
-(use-package org-auto-tangle
-  :hook (org-mode . org-auto-tangle-mode)
-  :config (setq org-auto-tangle-default t))
 (setq org-confirm-babel-evaluate nil)
 (org-babel-do-load-languages
  'org-babel-load-languages
- '((gnuplot . t)
-   (python . t)))
- 
+ '(
+   (gnuplot . t)
+   (haskell . t)
+   (python . t)
+   (sagemath . t)
+   ))
 
 ;;; Custom functions
 (defun reload ()
@@ -213,11 +187,6 @@
       (save-buffers-kill-emacs)
     (message "That's what I thought.")))
 (global-set-key (kbd "C-x C-c") 'ask-before-closing)
-
-(defun launch ()
-  (interactive)
-  (let ((cmd (read-string "Command: ")))
-    (start-process cmd nil cmd)))
 
 ;;; Movement
 (use-package ace-jump-mode)
