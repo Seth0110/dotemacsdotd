@@ -50,6 +50,9 @@
 (use-package olivetti
   :config (setq olivetti-body-width 80))
 
+;;; Code settings
+(global-set-key (kbd "C-;") 'comment-or-uncomment-region)
+
 ;;; Autocomplete
 (use-package company)
 
@@ -65,6 +68,14 @@
 (require 'em-tramp)
 (add-to-list 'eshell-modules-list 'eshell-tramp)
 
+;;; Go
+(use-package go-mode)
+(add-hook 'before-save-hook 'gofmt-before-save)
+(add-hook 'go-mode-hook
+	  (lambda ()
+	    (set (make-local-variable 'compile-command)
+		 "go build .")))
+
 ;;; Haskell
 (use-package company-ghci)
 (use-package haskell-mode)
@@ -79,6 +90,10 @@
 (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
 (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+(add-hook 'haskell-mode-hook
+	  (lambda ()
+	    (set (make-local-variable 'compile-command)
+		 "stack build")))
 
 ;;; Python
 (defvar python-shell-interpreter "python3")
@@ -188,9 +203,11 @@
     (message "That's what I thought.")))
 (global-set-key (kbd "C-x C-c") 'ask-before-closing)
 
-;;; Movement
+;;; Efficiency
 (use-package ace-jump-mode)
 (bind-key "C-." 'ace-jump-mode)
+(use-package which-key)
+(which-key-mode)
 
 ;;; Work stuff
 (if (file-exists-p "~/.emacs.d/work.el")
