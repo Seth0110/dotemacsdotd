@@ -9,6 +9,10 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
+;;; Theme
+(use-package plan9-theme)
+(load-theme 'plan9)
+
 ;;; Various display modes
 (display-time-mode)
 (display-battery-mode)
@@ -27,13 +31,6 @@
        (global-hl-line-mode 1)))
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
-;;; Color scheme
-(use-package almost-mono-themes)
-(if (not (window-system))
-    (load-theme 'adwaita)
-  (load-theme 'almost-mono-cream t))
-
-
 ;;; Window settings
 (use-package golden-ratio)
 (global-set-key (kbd "C-S-g") 'golden-ratio)
@@ -42,7 +39,7 @@
 (show-paren-mode 1)
 (defvar show-paren-delay 0)
 (set-default-coding-systems 'utf-8)
-(set-face-attribute 'default nil :height 140)
+(set-face-attribute 'default nil :height 180)
 (set-language-environment 'utf-8)
 (add-hook 'text-mode-hook 'line-number-mode)
 (use-package csv-mode
@@ -50,8 +47,6 @@
   (add-hook 'csv-mode 'csv-align-mode))
 (use-package visual-regexp)
 (use-package visual-regexp-steroids)
-(use-package olivetti
-  :config (setq olivetti-body-width 80))
 
 ;;; Code settings
 (global-set-key (kbd "C-;") 'comment-or-uncomment-region)
@@ -103,6 +98,7 @@
 ;;; Elisp & Eshell
 (require 'em-tramp)
 (add-to-list 'eshell-modules-list 'eshell-tramp)
+(use-package async)
 
 ;;; Go
 (use-package go-mode)
@@ -155,6 +151,9 @@
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
 
+;;; Notes
+(setq org-default-notes-file (concat org-directory "/notes.org"))
+
 ;;; Directory
 (setq dired-listing-switches "-alFh")
 (setq epa-pinentry-mode 'loopback)
@@ -165,10 +164,13 @@
 (setq browse-url-browser-function 'eww-browse-url)
 (defun eww-read ()
   (interactive)
-  (progn
-    (olivetti-mode)
-    (eww-readable)))
+  (eww-readable))
 (define-key eww-mode-map (kbd "o") 'eww-read)
+(setq reddigg-subs '(
+		     emacs
+		     golang
+		     orgmode
+		     ))
 
 ;;; Annoying settings
 (global-unset-key (kbd "C-z"))
@@ -195,12 +197,9 @@
 (use-package magit)
 
 ;;; Org mode
-;; (add-hook 'org-mode-hook 'org-indent-mode)
-(setq org-hide-emphasis-markers t)
+(add-hook 'org-mode-hook 'org-indent-mode)
 (add-hook 'org-mode-hook 'visual-line-mode)
 (setq org-pretty-entities t)
-(use-package org-appear
-    :hook (org-mode . org-appear-mode))
 (defun fix-org-mode-levels ()
   "Stop the org-level headers from increasing in height relative to the other text."
   (dolist (face '(org-level-1
@@ -211,7 +210,7 @@
     (set-face-attribute face nil :weight 'semi-bold :height 1.0)))
 (add-hook 'org-mode-hook 'fix-org-mode-levels)
 (setq org-agenda-files
-      (list "~/Documents/org/work.org"))
+      (list "~/org/notes.org"))
 (setq org-return-follows-link t)
 (define-key global-map "\C-cl" 'org-store-link)
 (define-key global-map "\C-ca" 'org-agenda)
@@ -219,12 +218,7 @@
 (setq org-confirm-babel-evaluate nil)
 (org-babel-do-load-languages
  'org-babel-load-languages
- '(
-   (gnuplot . t)
-   (haskell . t)
-   (python . t)
-   (sagemath . t)
-   ))
+ '((sagemath . t)))
 
 ;;; Custom functions
 (defun reload ()
@@ -245,6 +239,7 @@
 (bind-key "C-." 'ace-jump-mode)
 (use-package which-key)
 (which-key-mode)
+(fset 'yes-or-no-p 'y-or-n-p)
 
 ;;; Work stuff
 (if (file-exists-p "~/.emacs.d/work.el")
