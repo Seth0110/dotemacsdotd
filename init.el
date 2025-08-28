@@ -1,5 +1,11 @@
 ;;;; My personal Emacs configuration file.
 
+;;; Annoying settings
+(global-unset-key (kbd "C-z"))
+(setq backup-directory-alist '(("." . "~/.emacs.d/saves")))
+(setq custom-file "~/.emacs.d/custom.el")
+(setq ring-bell-function 'ignore)
+
 ;;; Set up package management
 (package-initialize)
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
@@ -9,9 +15,29 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
+;;; Custom functions
+(defun reload ()
+  "Reload the init file without restarting"
+  (interactive)
+  (load-file "~/.emacs.d/init.el"))
+
+(defun ask-before-closing ()
+  "Ask if you really want to quit"
+  (interactive)
+  (if (y-or-n-p (format "Are you sure you want to blaspheme the sacred editor? "))
+      (save-buffers-kill-emacs)
+    (message "That's what I thought.")))
+(global-set-key (kbd "C-x C-c") 'ask-before-closing)
+
+(defun decide ()
+  "Decide between a yes or a no"
+  (interactive)
+  (prin1 (if (zerop (random 2))
+	     'yes 'no)))
+
 ;;; Theme
 (use-package plan9-theme)
-(load-theme 'plan9)
+(load-theme 'plan9 t)
 
 ;;; Various display modes
 (display-time-mode)
@@ -60,6 +86,7 @@
 
 ;;; C
 (use-package column-enforce-mode)
+(use-package auto-header)
 (add-hook 'c-mode-hook 'column-enforce-mode)
 ;;;; Linux kernel coding style
 (defun c-lineup-arglist-tabs-only (ignored)
@@ -95,7 +122,7 @@
 (setq c-default-style "linux-tabs-only"
       c-basic-offset 8)
 
-;;; Elisp & Eshell
+;;; Elisp
 (require 'em-tramp)
 (add-to-list 'eshell-modules-list 'eshell-tramp)
 (use-package async)
@@ -104,10 +131,6 @@
 (use-package go-mode)
 (add-hook 'go-mode-hook 'column-enforce-mode)
 (add-hook 'before-save-hook 'gofmt-before-save)
-(add-hook 'go-mode-hook
-	  (lambda ()
-	    (set (make-local-variable 'compile-command)
-		 "go build .")))
 
 ;;; Haskell
 (use-package company-ghci)
@@ -133,26 +156,36 @@
 (use-package pyvenv)
 (use-package pyvenv-auto)
 
-;;; SageMath
-(use-package sage-shell-mode)
-(use-package ob-sagemath)
+;;; Web
+(use-package web-mode
+  :ensure t
+  :mode
+  (("\\.phtml\\'" . web-mode)
+   ("\\.php\\'" . web-mode)
+   ("\\.tpl\\'" . web-mode)
+   ("\\.[agj]sp\\'" . web-mode)
+   ("\\.as[cp]x\\'" . web-mode)
+   ("\\.erb\\'" . web-mode)
+   ("\\.mustache\\'" . web-mode)
+   ("\\.djhtml\\'" . web-mode)
+   ("\\.html?\\'" . web-mode)
+   ("\\.js?\\'" . web-mode)
+   ("\\.css?\\'" . web-mode)
+   ("\\.xml?\\'" . web-mode)))
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
 
 ;;; Various languages
 (use-package bison-mode)
 (use-package dockerfile-mode)
 (use-package gnuplot)
-(use-package haskell-mode)
 (use-package json-mode)
 (use-package markdown-mode)
-(use-package nginx-mode)
 (use-package yaml-mode)
 
 ;;; Enable "advanced" features
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
-
-;;; Notes
-(setq org-default-notes-file (concat org-directory "/notes.org"))
 
 ;;; Directory
 (setq dired-listing-switches "-alFh")
@@ -162,21 +195,15 @@
 ;;; Web
 (setq eww-search-prefix "https://duckduckgo.com/lite/?q=")
 (setq browse-url-browser-function 'eww-browse-url)
-(defun eww-read ()
-  (interactive)
-  (eww-readable))
-(define-key eww-mode-map (kbd "o") 'eww-read)
-(setq reddigg-subs '(
-		     emacs
-		     golang
-		     orgmode
-		     ))
+(use-package wttrin
+  :custom
+  (wttrin-default-locations '("East Syracuse")))
 
-;;; Annoying settings
-(global-unset-key (kbd "C-z"))
-(setq backup-directory-alist '(("." . "~/.emacs.d/saves")))
-(setq custom-file "~/.emacs.d/custom.el")
-(setq ring-bell-function 'ignore)
+;;; RSS
+(use-package elfeed)
+(setq elfeed-curl-extra-arguments '("--insecure"))
+(setq elfeed-feeds '("https://stallman.org/rss/rss.xml"
+		     "https://lukesmith.xyz/index.xml"))
 
 ;;; PDF
 (defun set-pdf-tools ()
@@ -193,11 +220,9 @@
     :config
     (set-pdf-tools))
 
-;;; Revision control
-(use-package magit)
-
 ;;; Org mode
-(add-hook 'org-mode-hook 'org-indent-mode)
+(require 'org)
+;; (add-hook 'org-mode-hook 'org-indent-mode)
 (add-hook 'org-mode-hook 'visual-line-mode)
 (setq org-pretty-entities t)
 (defun fix-org-mode-levels ()
@@ -216,23 +241,10 @@
 (define-key global-map "\C-ca" 'org-agenda)
 (define-key global-map "\C-cc" 'org-capture)
 (setq org-confirm-babel-evaluate nil)
+(setq org-default-notes-file (concat org-directory "/notes.org"))
 (org-babel-do-load-languages
  'org-babel-load-languages
- '((sagemath . t)))
-
-;;; Custom functions
-(defun reload ()
-  "Reload the init file without restarting"
-  (interactive)
-  (load-file "~/.emacs.d/init.el"))
-
-(defun ask-before-closing ()
-  "Ask if you really want to quit"
-  (interactive)
-  (if (y-or-n-p (format "Are you sure you want to blaspheme the sacred editor? "))
-      (save-buffers-kill-emacs)
-    (message "That's what I thought.")))
-(global-set-key (kbd "C-x C-c") 'ask-before-closing)
+ '((python . t) (shell . t)))
 
 ;;; Efficiency
 (use-package ace-jump-mode)
