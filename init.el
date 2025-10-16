@@ -37,7 +37,7 @@
 
 ;;; Theme
 (use-package plan9-theme)
-(load-theme 'plan9 t)
+;; (load-theme 'plan9 t)
 
 ;;; Various display modes
 (display-time-mode)
@@ -112,15 +112,11 @@
           (lambda ()
             (let ((filename (buffer-file-name)))
               ;; Enable kernel mode for the appropriate files
-              (when (and filename
-                         (string-match (expand-file-name "~/src/linux-trees")
-                                       filename))
-                (setq indent-tabs-mode t)
-                (setq show-trailing-whitespace t)
-                (c-set-style "linux-tabs-only")))))
-
-(setq c-default-style "linux-tabs-only"
-      c-basic-offset 8)
+              (setq indent-tabs-mode t)
+              (setq tab-width 8)
+	      (setq comment-style 'extra-line)
+              (setq show-trailing-whitespace t)
+              (c-set-style "linux-tabs-only"))))
 
 ;;; Elisp
 (require 'em-tramp)
@@ -172,8 +168,8 @@
    ("\\.js?\\'" . web-mode)
    ("\\.css?\\'" . web-mode)
    ("\\.xml?\\'" . web-mode)))
-(setq-default indent-tabs-mode nil)
-(setq-default tab-width 4)
+;; (setq-default indent-tabs-mode nil)
+;; (setq-default tab-width 4)
 
 ;;; Various languages
 (use-package bison-mode)
@@ -195,9 +191,6 @@
 ;;; Web
 (setq eww-search-prefix "https://duckduckgo.com/lite/?q=")
 (setq browse-url-browser-function 'eww-browse-url)
-(use-package wttrin
-  :custom
-  (wttrin-default-locations '("East Syracuse")))
 
 ;;; RSS
 (use-package elfeed)
